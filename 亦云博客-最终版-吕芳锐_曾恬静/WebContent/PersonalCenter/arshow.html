@@ -1,0 +1,1881 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>text</title>
+
+    <!-- css -->
+    <link href="../css/bootstrap.css" rel="stylesheet" />
+    <link href="../css/header_and_footer.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/note.css">
+    <link rel="stylesheet" href="../css/article.css">
+    <!--javascript-->
+    <script src="../js/jquery-3.3.1.js"></script>
+    <script src="../js/require.js"></script>
+    <script src="../js/bootstrap.js"></script>
+
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style>
+	
+    </style>
+    <link href="css/header_and_footer.css" rel="stylesheet" />
+</head>
+<body style="padding-top:50px; margin:8px 0 0 0;">
+    <iframe src="../header_and_footer/header.html" id="iframe-header"></iframe>
+        
+	<div class="container"  style="margin-top:50px;">
+   <div class="row">
+  <div class="col-md-9 col-lg-9  col-sm-12 col-xs-12  ">	
+		
+		<div class="note-header note-header-container">
+        <h1>MyCat 启蒙：分布式系统的数据库架构演变</h1>
+
+    
+    <div>
+        <a href="#"><img class="note_author_avatar" width="24" height="24" src="../image/sivan.jpg" alt="内陆飞鱼"></a>
+        <a href="#" class="note-author">内陆飞鱼</a>
+    </div>
+    </div>
+
+	<br/>
+    
+    <div class="note" style="display:none;"></div>
+    <div>
+            
+<p>MyCat 是一个数据库分库分表中间件，使用 MyCat 可以非常方便地实现数据库的分库分表查询，并且减少项目中的业务代码。今天我们将通过数据库架构发展的演变来介绍 MyCat 的诞生背景，以及 MyCat 在其中扮演的角色，从而使得大家对 MyCat 的诞生及其作用有深入的理解。
+</p>
+<h2>1单数据库架构</h2>
+<p>一个项目在初期的时候，为了尽可能快地验证市场，其对业务系统的最大要求是快速实现。在这个阶段，代码开发人员为了能快速实现业务系统，一般都是将所有层级（MVC）的业务代码都写在同一个项目中，所有的业务数据都存放在同一个数据库中。此时，项目的整体架构图如下所示：</p>
+<img href="../image/jia1.png">
+<p>从上图可以看到，我们在一个项目中集中了注册、登陆、购物三个模块的业务代码，并且这三个业务模块都读取同一个业务数据库。
+</p>
+<p>但随着项目的不断推进，用户量不断增长，单台应用服务器已经无法承受如此巨大的流量了。此时常见的做法是把项目进行分布式部署，分散单台服务器的流量，从而可以暂时缓解用户增长带来的应用服务器压力。此时的项目架构图如下所示：</p>
+<img href="../image/jia2.jpg">
+<p>但随着我们部署的应用服务器越来越多，后端的单台数据库服务器已经无法承受如此巨大的流量了。为了尽快缓解用户访问压力，我们一般是在应用服务器与数据库服务器中间加多一个缓存层，通过缓存可以抵消掉一部分的数据库查询操作。此时的项目架构图如下所示：</p>
+<img href="../image/jia3.jpg">
+<p>但是增加数据库缓存层只能缓解数据库访问压力，拦截部分数据库访问请求。随着用户访问量的进一步增长，数据库访问的瓶颈还是会进一步凸显。这个时候，我们不得不对数据层的架构进行改造。</p>
+<h2>2主从数据库架构</h2>
+<p>这个时候常用的解决方案就是将原本单台数据库服务器变成主从模式的数据库服务器，即一台数据库作为主库支持写入数据，一台数据库作为读库支持查询数据。此时项目的架构图如下所示：</p>
+<img href="../image/jia4.jpg">
+<p>我们通过数据库主从同步实现了读写分离，将所有读操作都引导到从库进行，将所有写操作都引导到主库进行。</p>
+<p>因为我们对数据库层进行了改造，规定所有读数据库操作要访问从库，所有写数据库操作要访问主库，那么我们就必须对原来的代码进行改造。</p>
+            
+
+    </div>
+    
+	<div id="comments" class="">
+
+
+
+
+
+
+    
+
+<div class="comment-item" id="44584161" data-cid="44584161" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u32397230-16.jpg" alt="ZHAOYI"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-18 15:12:52</span>
+            <a href="#" class="  ">ZHAOYI</a> 
+        </div>
+
+
+        
+        <p class="">哪里能听？
+<br></p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44584161 hidden" title="删除ZHAOYI的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44584161 hidden" title="删除ZHAOYI的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u32397230 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除ZHAOYI的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44584252" data-cid="44584252" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u1226256-41.jpg" alt="内陆飞鱼"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-18 15:23:30</span>
+            <a href="#" class="  ">内陆飞鱼</a>  (因雨成歌，负债之人)
+        </div>
+
+            
+                
+                <div class="reply-quote">
+                <span class="short">哪里能听？
+</span>
+                <span class="all">哪里能听？
+</span>
+                <a href="#" class="toggle-reply">
+                </a><span class="#">ZHAOYI</a></span></div>
+
+
+        
+        <p class="">虾米\网易云音乐,等都有</p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44584252 hidden" title="删除内陆飞鱼的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44584252 hidden" title="删除内陆飞鱼的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u1226256 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除内陆飞鱼的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44584301" data-cid="44584301" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u32397230-16.jpg" alt="ZHAOYI"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-18 15:29:35</span>
+            <a href="#" class="  ">ZHAOYI</a> 
+        </div>
+
+
+        
+        <p class="">谢谢谢谢~~
+<br></p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44584301 hidden" title="删除ZHAOYI的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44584301 hidden" title="删除ZHAOYI的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u32397230 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除ZHAOYI的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44636806" data-cid="44636806" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u53068264-18.jpg" alt="大锤子和小锤子"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 00:09:49</span>
+            <a href="#" class="  ">大锤子和小锤子</a>  (In your eyes)
+        </div>
+
+
+        
+        <p class="">不错哦</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44636806 hidden" title="删除大锤子和小锤子的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44636806 hidden" title="删除大锤子和小锤子的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u53068264 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除大锤子和小锤子的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44637087" data-cid="44637087" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u135089267-9.jpg" alt="楠啵思密达"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 01:10:16</span>
+            <a href="#" class="  ">楠啵思密达</a>  (1999)
+        </div>
+
+
+        
+        <p class="">哈哈哈尧十三我的嫁！</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44637087 hidden" title="删除楠啵思密达的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44637087 hidden" title="删除楠啵思密达的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u135089267 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除楠啵思密达的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44637183" data-cid="44637183" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u130991723-2.jpg" alt="乐民"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 01:45:13</span>
+            <a href="#" class="  ">乐民</a>  (爱我别走开)
+        </div>
+
+
+        
+        <p class="">讲真的没听过</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44637183 hidden" title="删除乐民的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44637183 hidden" title="删除乐民的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u130991723 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除乐民的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44637269" data-cid="44637269" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u52453854-76.jpg" alt="少将威威"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 02:45:59</span>
+            <a href="#" class="  ">少将威威</a> 
+        </div>
+
+
+        
+        <p class="">秘密后院</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44637269 hidden" title="删除少将威威的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44637269 hidden" title="删除少将威威的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u52453854 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除少将威威的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44637572" data-cid="44637572" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/user_normal.jpg" alt="vv_99"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 07:38:52</span>
+            <a href="#" class="  ">vv_99</a> 
+        </div>
+
+
+        
+        <p class="">很多没有听过，多谢推荐。尧十三这张听过，非常棒，也特别喜欢《二娘》，欢乐且悲伤，少有的好专辑。</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44637572 hidden" title="删除vv_99的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44637572 hidden" title="删除vv_99的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u134475896 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除vv_99的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44638332" data-cid="44638332" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u1226256-41.jpg" alt="内陆飞鱼"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 09:40:11</span>
+            <a href="#" class="  ">内陆飞鱼</a>  (因雨成歌，负债之人)
+        </div>
+
+
+        
+        <p class="#">https://www.douban.c<wbr>om/note/510834592/</a></p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44638332 hidden" title="删除内陆飞鱼的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44638332 hidden" title="删除内陆飞鱼的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u1226256 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除内陆飞鱼的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44639335" data-cid="44639335" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u143627737-1.jpg" alt="Anan."></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 10:23:00</span>
+            <a href="#" class="  ">Anan.</a> 
+        </div>
+
+
+        
+        <p class="">还好有十三，piapiapia</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44639335 hidden" title="删除Anan.的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44639335 hidden" title="删除Anan.的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u143627737 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除Anan.的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44639770" data-cid="44639770" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u88681001-5.jpg" alt="再见孙悟空"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 10:50:58</span>
+            <a href="#" class="  ">再见孙悟空</a> 
+        </div>
+
+
+        
+        <p class="">收藏了</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44639770 hidden" title="删除再见孙悟空的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44639770 hidden" title="删除再见孙悟空的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u88681001 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除再见孙悟空的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44643460" data-cid="44643460" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u129548452-1.jpg" alt="没有吓死的宝宝"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 16:14:28</span>
+            <a href="#" class="  ">没有吓死的宝宝</a> 
+        </div>
+
+
+        
+        <p class="">轻日子的海报太好看o(≧o≦)o</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44643460 hidden" title="删除没有吓死的宝宝的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44643460 hidden" title="删除没有吓死的宝宝的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u129548452 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除没有吓死的宝宝的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44643546" data-cid="44643546" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u141003296-1.jpg" alt="❤精分薛豆蔻❤"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 16:22:56</span>
+            <a href="#" class="  ">❤精分薛豆蔻❤</a> 
+        </div>
+
+
+        
+        <p class="">有三首qq音乐找不到</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44643546 hidden" title="删除❤精分薛豆蔻❤的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44643546 hidden" title="删除❤精分薛豆蔻❤的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u141003296 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除❤精分薛豆蔻❤的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44644655" data-cid="44644655" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u141980607-1.jpg" alt="困在你的城"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 18:25:15</span>
+            <a href="#" class="  ">困在你的城</a> 
+        </div>
+
+
+        
+        <p class="">网易上好多都没有</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44644655 hidden" title="删除困在你的城的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44644655 hidden" title="删除困在你的城的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u141980607 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除困在你的城的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44645356" data-cid="44645356" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u142204060-1.jpg" alt="发僵掉的黄豆芽"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 20:33:44</span>
+            <a href="#" class="  ">发僵掉的黄豆芽</a> 
+        </div>
+
+
+        
+        <p class="">十三十三！龙港秘密！</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44645356 hidden" title="删除发僵掉的黄豆芽的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44645356 hidden" title="删除发僵掉的黄豆芽的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u142204060 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除发僵掉的黄豆芽的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44645487" data-cid="44645487" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u137785881-25.jpg" alt="释你"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 20:53:37</span>
+            <a href="#" class="  ">释你</a> 
+        </div>
+
+
+        
+        <p class="">请收下我的膝盖</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44645487 hidden" title="删除释你的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44645487 hidden" title="删除释你的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u137785881 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除释你的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44645908" data-cid="44645908" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u142827184-1.jpg" alt="Yvette"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 21:37:56</span>
+            <a href="#" class="  ">Yvette</a> 
+        </div>
+
+
+        
+        <p class="">喜欢十三 明天刚好要去看他哈哈哈</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44645908 hidden" title="删除Yvette的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44645908 hidden" title="删除Yvette的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u142827184 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除Yvette的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44646645" data-cid="44646645" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u140780560-4.jpg" alt="泡沫_vov"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-24 22:54:13</span>
+            <a href="#" class="  ">泡沫_vov</a> 
+        </div>
+
+
+        
+        <p class="">末小皮《远山》</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44646645 hidden" title="删除泡沫_vov的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44646645 hidden" title="删除泡沫_vov的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u140780560 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除泡沫_vov的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44647249" data-cid="44647249" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u57869881-8.jpg" alt="异性过敏"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 00:00:58</span>
+            <a href="#" class="  ">异性过敏</a>  (没有实力的愤怒毫无意义。)
+        </div>
+
+
+        
+        <p class="">为什么没有浓烟下的诗歌电台</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44647249 hidden" title="删除异性过敏的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44647249 hidden" title="删除异性过敏的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u57869881 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除异性过敏的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44647285" data-cid="44647285" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u70866321-2.jpg" alt="连城"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 00:03:54</span>
+            <a href="#" class="  ">连城</a> 
+        </div>
+
+
+        
+        <p class="">似乎听民谣的人越来越多了，好事</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44647285 hidden" title="删除连城的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44647285 hidden" title="删除连城的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u70866321 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除连城的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44647422" data-cid="44647422" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u141298440-1.jpg" alt="Frank"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 00:20:22</span>
+            <a href="#" class="  ">Frank</a> 
+        </div>
+
+
+        
+        <p class="">看到了翘十三</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44647422 hidden" title="删除Frank的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44647422 hidden" title="删除Frank的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u141298440 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除Frank的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44647677" data-cid="44647677" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u49224648-16.jpg" alt="猫小姐"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 01:00:08</span>
+            <a href="#" class="  ">猫小姐</a>  (不疯魔，不成活)
+        </div>
+
+
+        
+        <p class="">秘密后院的专辑叫《人间世》，不是人世间</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44647677 hidden" title="删除猫小姐的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44647677 hidden" title="删除猫小姐的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u49224648 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除猫小姐的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44648018" data-cid="44648018" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u138511703-7.jpg" alt="Aid麦子"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 06:43:04</span>
+            <a href="#" class="  ">Aid麦子</a> 
+        </div>
+
+            
+                
+                <div class="reply-quote">
+                <span class="short">有三首qq音乐找不到</span>
+                <span class="all">有三首qq音乐找不到</span>
+                <a href="#" class="toggle-reply">
+                </a><span class="#">❤精分薛豆蔻❤</a></span></div>
+
+
+        
+        <p class="">是哪三首哦</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44648018 hidden" title="删除Aid麦子的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44648018 hidden" title="删除Aid麦子的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u138511703 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除Aid麦子的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44648164" data-cid="44648164" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/user_normal.jpg" alt="[已注销]"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 07:45:23</span>
+            <a href="#" class="  ">[已注销]</a> 
+        </div>
+
+
+        
+        <p class="">妈哒 封面一个比一个好看</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44648164 hidden" title="删除[已注销]的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44648164 hidden" title="删除[已注销]的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u72692979 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除[已注销]的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44648165" data-cid="44648165" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/user_normal.jpg" alt="[已注销]"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 07:45:26</span>
+            <a href="#" class="  ">[已注销]</a> 
+        </div>
+
+
+        
+        <p class="">妈哒 封面一个比一个好看</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44648165 hidden" title="删除[已注销]的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44648165 hidden" title="删除[已注销]的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u72692979 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除[已注销]的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44653420" data-cid="44653420" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u137796111-8.jpg" alt="Boom"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 17:17:30</span>
+            <a href="#" class="  ">Boom</a> 
+        </div>
+
+
+        
+        <p class="">么么十三叔</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44653420 hidden" title="删除Boom的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44653420 hidden" title="删除Boom的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u137796111 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除Boom的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44654771" data-cid="44654771" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/user_normal.jpg" alt="kingserli"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 20:39:37</span>
+            <a href="#" class="  ">kingserli</a> 
+        </div>
+
+
+        
+        <p class="">meijzwj.com</p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44654771 hidden" title="删除kingserli的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44654771 hidden" title="删除kingserli的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u140531086 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除kingserli的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44654858" data-cid="44654858" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u124771646-2.jpg" alt="哑哑与亚亚yz"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 20:53:07</span>
+            <a href="#" class="  ">哑哑与亚亚yz</a>  (一个傻瓜，两个傻瓜，都是傻瓜)
+        </div>
+
+            
+                
+                <div class="reply-quote">
+                <span class="short">末小皮《远山》</span>
+                <span class="all">末小皮《远山》</span>
+                <a href="#" class="toggle-reply">
+                </a><span class="#">泡沫_vov</a></span></div>
+
+
+        
+        <p class="">同 喜欢</p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44654858 hidden" title="删除哑哑与亚亚yz的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44654858 hidden" title="删除哑哑与亚亚yz的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u124771646 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除哑哑与亚亚yz的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44654947" data-cid="44654947" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/user_normal.jpg" alt="每月一小时"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 21:08:38</span>
+            <a href="#" class="  ">每月一小时</a> 
+        </div>
+
+
+        
+        <p class="">66666666</p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44654947 hidden" title="删除每月一小时的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44654947 hidden" title="删除每月一小时的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u132235191 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除每月一小时的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44655107" data-cid="44655107" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u35826454-177.jpg" alt="蘑界智障大白田"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 21:32:09</span>
+            <a href="#" class="  ">蘑界智障大白田</a>  (疾行灭隐 燃灯寒林)
+        </div>
+
+
+        
+        <p class="">赞，可以转载到公众号吗？会署名的</p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44655107 hidden" title="删除蘑界智障大白田的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44655107 hidden" title="删除蘑界智障大白田的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u35826454 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除蘑界智障大白田的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44655407" data-cid="44655407" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u89827875-5.jpg" alt="Fiona"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 22:11:47</span>
+            <a href="#" class="  ">Fiona</a>  (间歇性偏执症患者)
+        </div>
+
+
+        
+        <p class="">马克</p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44655407 hidden" title="删除Fiona的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44655407 hidden" title="删除Fiona的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u89827875 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除Fiona的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44655702" data-cid="44655702" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u75294876-3.jpg" alt="三色菩提"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-25 22:49:17</span>
+            <a href="#" class="  ">三色菩提</a> 
+        </div>
+
+
+        
+        <p class="">赵牧阳的《回家》是我们做的。真心谢谢你！</p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44655702 hidden" title="删除三色菩提的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44655702 hidden" title="删除三色菩提的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u75294876 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除三色菩提的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44656321" data-cid="44656321" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u85290371-4.jpg" alt="常安"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-26 00:06:05</span>
+            <a href="#" class="  ">常安</a>  (平衡自己的苟且与远方)
+        </div>
+
+
+        
+        <p class="">听过尧十三和蒋明的，其他的确实还没有听过，回头去听。</p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44656321 hidden" title="删除常安的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44656321 hidden" title="删除常安的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u85290371 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除常安的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44656522" data-cid="44656522" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u40601357-7.jpg" alt="董沃瑞"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-26 00:43:05</span>
+            <a href="#" class="  ">董沃瑞</a>  (你看，这世界辽阔美丽。)
+        </div>
+
+
+        
+        <p class="">没有曹方……
+<br></p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44656522 hidden" title="删除董沃瑞的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44656522 hidden" title="删除董沃瑞的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u40601357 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除董沃瑞的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44656672" data-cid="44656672" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u132077095-4.jpg" alt="十四味"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-26 01:07:08</span>
+            <a href="#" class="  ">十四味</a> 
+        </div>
+
+            
+                
+                <div class="reply-quote">
+                <span class="short">为什么没有浓烟下的诗歌电台</span>
+                <span class="all">为什么没有浓烟下的诗歌电台</span>
+                <a href="#" class="toggle-reply">
+                </a><span class="#">异性过敏</a></span></div>
+
+
+        
+        <p class="">同</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44656672 hidden" title="删除十四味的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44656672 hidden" title="删除十四味的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u132077095 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除十四味的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44656923" data-cid="44656923" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u57800697-5.jpg" alt="罗那耳朵先生"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-26 03:19:50</span>
+            <a href="#" class="  ">罗那耳朵先生</a> 
+        </div>
+
+
+        
+        <p class="">肿么没有咱家邵小毛的《新青年》？上半年的？</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44656923 hidden" title="删除罗那耳朵先生的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44656923 hidden" title="删除罗那耳朵先生的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u57800697 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除罗那耳朵先生的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44662406" data-cid="44662406" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u143752290-1.jpg" alt="森林麋鹿與魚"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-26 23:45:11</span>
+            <a href="#" class="  ">森林麋鹿與魚</a> 
+        </div>
+
+
+        
+        <p class="">怎麼會沒有趙雷宋冬野的呢</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44662406 hidden" title="删除森林麋鹿與魚的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44662406 hidden" title="删除森林麋鹿與魚的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u143752290 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除森林麋鹿與魚的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44662564" data-cid="44662564" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u40601357-7.jpg" alt="董沃瑞"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-27 00:16:37</span>
+            <a href="#" class="  ">董沃瑞</a>  (你看，这世界辽阔美丽。)
+        </div>
+
+            
+                
+                <div class="reply-quote">
+                <span class="short">肿么没有咱家邵小毛的《新青年》？上半年的？</span>
+                <span class="all">肿么没有咱家邵小毛的《新青年》？上半年的？</span>
+                <a href="#" class="toggle-reply">
+                </a><span class="#">罗那耳朵先生</a></span></div>
+
+
+        
+        <p class="">放在上半年了</p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44662564 hidden" title="删除董沃瑞的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44662564 hidden" title="删除董沃瑞的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u40601357 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除董沃瑞的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44664530" data-cid="44664530" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u66990947-6.jpg" alt="keep going"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-27 11:50:39</span>
+            <a href="#" class="  ">keep going</a> 
+        </div>
+
+
+        
+        <p class="">没有陈鸿宇？</p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44664530 hidden" title="删除keep going的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44664530 hidden" title="删除keep going的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u66990947 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除keep going的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44681404" data-cid="44681404" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u143325836-1.jpg" alt="十八"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-29 10:58:10</span>
+            <a href="#" class="  ">十八</a> 
+        </div>
+
+
+        
+        <p class="">我也爱十三哥的北方女王</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44681404 hidden" title="删除十八的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44681404 hidden" title="删除十八的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u143325836 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除十八的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44683278" data-cid="44683278" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u1567064-4.jpg" alt="Ya-Ya"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-29 13:56:48</span>
+            <a href="#" class="  ">Ya-Ya</a>  (虎！虎！虎！)
+        </div>
+
+            
+                
+                <div class="reply-quote">
+                <span class="short">为什么没有浓烟下的诗歌电台</span>
+                <span class="all">为什么没有浓烟下的诗歌电台</span>
+                <a href="#" class="toggle-reply">
+                </a><span class="#">异性过敏</a></span></div>
+
+
+        
+        <p class="">我也喜欢陈鸿宇</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44683278 hidden" title="删除Ya-Ya的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44683278 hidden" title="删除Ya-Ya的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u1567064 p_admin p_intern fright">&gt;
+                <a rel="#" class="j a_confirm_link" title="删除Ya-Ya的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44687912" data-cid="44687912" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/u143891169-1.jpg" alt="梁梁梁梁高"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-03-29 22:38:24</span>
+            <a href="#" class="  ">梁梁梁梁高</a> 
+        </div>
+
+
+        
+        <p class="">我觉得陈粒和燕池也挺好的</p>
+
+        <div class="op-lnks">
+        
+<br/>
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="#" class="j a_confirm_link lnk-delete lnk-delete-44687912 hidden" title="删除梁梁梁梁高的留言?">删除</a>
+
+        <a rel="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44687912 hidden" title="删除梁梁梁梁高的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u143891169 p_admin p_intern fright">&gt;
+                <a rel="nofollow" href="#" class="j a_confirm_link" title="删除梁梁梁梁高的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+<div class="comment-item" id="44817629" data-cid="44817629" data-target_id="545907448" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="#"><img width="48" height="48" class="" src="../image/user_normal.jpg" alt="colly"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2016-04-13 14:58:40</span>
+            <a href="#" class="  ">colly</a> 
+        </div>
+
+
+        
+        <p class="">赞</p>
+
+        <div class="op-lnks">
+        
+
+        <a href="#" class="lnk-reply hidden">回应</a>
+
+        <a rel="nofollow" href="#" class="j a_confirm_link lnk-delete lnk-delete-44817629 hidden" title="删除colly的留言?">删除</a>
+
+        <a rel="nofollow" href="#" class="j a_confirm_link lnk-admin-delete lnk-admin-delete-44817629 hidden" title="删除colly的留言?">删除</a>
+
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u138692327 p_admin p_intern fright">&gt;
+                <a rel="nofollow" href="#" class="j a_confirm_link" title="删除colly的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div id="last"></div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+    <br><span class="pl2" align="right"><a class="j a_show_login" href="#">&gt; 我来回应</a></span>
+	<textarea class="form-control"style="margin-top:5px;" rows="3"></textarea>
+	<button type="submit" class="btn btn-default"style="margin-top:5px;float:right;">提交</button>
+ 
+
+ 
+
+    
+    
+    
+
+
+
+
+
+
+
+
+</div>
+	</div>
+	  <div class="col-md-3 col-lg-3  col-sm-0 col-xs-0">
+	  	<div class="HOT baikapian">
+	<div class="remen" style="text-align:center;">热门话题</div>	
+	<div class="hottopic">
+	<a href="#">
+	#【花式填坑】第23期#<br/>
+	运维进化篇：成为Python <br/>
+	DevOps工程师有哪些必备条件？
+	</a>
+	</div>
+	<div class="hotpic">
+	<img src="../image/hot1.jpg"/>
+	</div>
+	<div class="hotcontent">	当越来越多的人想要成为牛x的运维开发，但缺乏掌握全面的技术与实战能力时，怎么办呢？如果有一天领导要你去负责一个运维项目，你知道你还欠缺些什么吗？如果一个运维没有扎实的开发基础，如何更好的实现一套系统化平台？参与本话题，让大牛老师替你解答！
+	</div>
+	<a href="#">
+	<div class="tiaozhuan">
+	了解详情<span class="glyphicon glyphicon-arrow-right"></span>
+	</div></a>
+	<div class="wangqi">往期回顾</div>
+	<div class="zuowenzi">#【花式填坑】第22期#
+	<br/>金三银四到来之前，你得学会如何面试</div>
+	<div class="hotpic">
+	<img src="../image/hot2.jpg"/>
+	</div>	
+	<div class="zuowenzi">#【花式填坑】第21期#
+	<br/>对于现代前端必备技能Node.js，有什么想说的吗</div>
+	<div class="hotpic">
+	<img src="../image/hot3.jpg"/>
+	</div>	
+	<div class="zuowenzi">#【花式填坑】第20期#
+	<br/>是时候说说 #挨踢狗们の国庆假期#了</div>
+	<div class="hotpic">
+	<img src="../image/hot4.jpg"/>
+	</div>	
+	</div>
+  </div>
+	  </div>
+	  </div>
+	  </div>
+	  <br/><br/><br/>
+	
+	<iframe src="../header_and_footer/footer.html" id="iframe-footer"></iframe>
+</body>
+</html>

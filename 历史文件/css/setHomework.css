@@ -1,0 +1,48 @@
+body 
+{
+	font-family: Avenir, 'Helvetica Neue', 'Lato', 'Segoe UI', Helvetica, Arial, sans-serif;
+	color: #4b0f31;
+	background-color: #eee;
+}
+hr
+{
+	height:1px;
+	border:none;
+	border-top:1px dashed #555555;
+}
+.inputfile 
+{
+	width: 0.1px; 
+	height: 0.1px; 
+	opacity: 0; 
+	overflow: hidden; 
+	position: absolute; 
+	z-index: -1;
+}
+.inputfile + label 
+{
+	font-size: 1.25em;
+	font-weight: 700;
+	color: white;
+	background-color:#ff6666;
+	display: inline-block;
+}
+.inputfile:focus + label,
+.inputfile + label:hover 
+{
+	background-color: red;
+}
+.inputfile:focus + label 
+{
+	outline: 1px dotted #000; 
+	outline: -webkit-focus-ring-color auto 5px;
+}
+#myTabContent 
+{
+    margin-top: 30px;
+    margin-bottom: 30px;
+    background-color: #fff;
+	box-shadow: 2px 2px 3px #aaaaaa;
+    min-height: 500px;
+    padding: 30px;
+}

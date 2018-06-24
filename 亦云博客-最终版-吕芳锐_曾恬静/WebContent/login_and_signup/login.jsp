@@ -1,0 +1,176 @@
+<%@page import="java.sql.ResultSet"%>
+<%@page import="DBConfig.DBConnector"%>
+<%@page import="Action.UserAction"%>
+<%@page import="Impl.UserImpl" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+   
+<%
+	//获取项目根地址
+	String basePath = request.getContextPath();
+	//将根地址假如页面级变量方便之后通过EL表达式调用
+	pageContext.setAttribute("basePath", basePath);
+	
+	
+	//if( request ){
+	
+	String username = request.getParameter("username");
+	String password = request.getParameter("password");
+	System.out.println(username);
+	System.out.println(password);
+	
+	boolean tiao=false;
+	
+	/*
+		DBConnector d = new DBConnector();
+		String sql="Select * from users where username=\"" +username+"\"and passwd=\""+password+"\"" ;
+		
+		System.out.println(sql);
+		ResultSet re=d.excuteQuery(sql);
+		int count=0;
+		while(re.next())count++;
+		
+		if(count!=0)
+		{
+			System.out.println("password secuss!");
+			tiao=true;
+			 
+		}else{
+			System.out.println("password error!");
+			tiao=false;
+		}
+	//}
+	*/
+	
+%>
+
+
+<!DOCTYPE html>
+<!-- saved from url=(0039)https://v3.bootcss.com/examples/signin/ -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="https://v3.bootcss.com/favicon.ico">
+
+    <title>Signin Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="../css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../css/signin.css" rel="stylesheet">
+    <script src="../js/jquery-3.3.1.js"></script>
+    <script src="../js/require.js"></script>
+    <script src="../js/bootstrap.js"></script>
+
+    <script src="../js/ie-emulation-modes-warning.js"></script>
+    <link href="../css/header_and_footer.css" rel="stylesheet" />
+	
+	<script src="${basePath}/js/jquery-3.3.1.js"></script>
+	<script>
+		if(<%=tiao%>){
+			window.location.href="<%=basePath%>/homepage.jsp";
+		}
+		function login(){
+			var username=$('#username').val()
+			var password=$('#password').val()
+			var basePath = '<%=basePath%>';  //js中不能使用EL表达式
+			
+			//通过ajax向服务器发起请求查询数据库
+			//第一个参数为ajax请求地址,本项目中为自己写的servlet类
+			//第二个参数为{XXX} 类型的JSON字符串，关于JSON 可自行Baidu
+			//第三个参数为回调函数，即ajax请求完成后执行的函数，result为服务器返回的参数
+			$.post(basePath+'/UserAction',{type:'login'
+				,username:username
+				,password:password},function(result){
+					if(result == "success"){
+						alert("login success");
+						window.location.href="<%=basePath%>/homepage.jsp";
+					}else{
+						alert("login failed;Maybe is error password");
+					}
+				})
+				
+		}
+	</script>
+	
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	<style>
+	.kuang{
+	top: 50%;
+	left: 50%;
+	position: absolute;
+	display: block;
+	transform:translate(-50%,-50%);
+	width:500px;
+	height:290px;
+	background-color:#f8d6d5;
+	}
+	.biaoti{
+	text-align:center;
+	width:500px;
+	height:40px;
+	font-size:40px;
+	color:white;
+	display: block;
+	position:absolute;
+	margin-top:-60px;
+	}
+	.sign{
+	text-align:center;
+	width:500px;
+	height:30px;
+	font-size:18px;
+	color:white;
+	display: block;
+	position:absolute;
+	margin-top:40px;
+	}
+	.sign a{
+	color:white;
+	}
+	.sign > a :hover,.sign > a :focus{
+	color:#f8d6d5;
+	}
+	</style>
+</head>
+
+<body style="background-color:#ab2526">
+   <jsp:include page="../header_and_footer/header.jsp" flush="true"/>
+
+    <div class="kuang">
+    <div class="biaoti">亦&emsp;云</div>
+      <form class="form-signin">
+        <h2 class="form-signin-heading">Please log in</h2>
+        <label for="inputEmail" class="sr-only">Username</label>
+        <input style="background-color:#f8d6d5" type="text" id="username" name="username" class="form-control" placeholder="Email address">
+        <label  for="inputPassword" class="sr-only">Password</label>
+        <input style="background-color:#f8d6d5" type="password" id="password"  name="password" class="form-control" placeholder="Password" >
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+        </div>
+        <button onclick="login()" style="background-color:#ab2526;border-color:#ab2526"class="btn btn-lg btn-primary btn-block" type="submit">log in</button>
+		
+      </form>
+	  <div class="sign">Don't have an account?<a href="regiser.jsp">sign up</a></div>
+
+    </div> <!-- /container -->
+
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+</body></html>
